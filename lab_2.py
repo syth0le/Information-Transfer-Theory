@@ -4,7 +4,7 @@ from scipy.fft import fft, fftfreq, fftshift, rfft, rfftfreq
 from scipy import signal
 
 SAMPLE_RATE = 800  # Hertz
-DURATION = 5  # Seconds
+DURATION = 3  # Seconds
 
 
 def generate_sine_wave(freq, sample_rate, duration):
