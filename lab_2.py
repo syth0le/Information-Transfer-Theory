@@ -26,27 +26,33 @@ class FFT:
 
     @staticmethod
     def _draw_graphic(xf, yf, fast_xf, fast_yf, freq, response):
-        plt.axis([min(xf), max(xf), 0, 500])
-        plt.plot(xf, np.abs(yf), color='red', linewidth= 4)
-        plt.plot(fast_xf, np.abs(fast_yf), color='blue')
+        plt.axis([-100, 0, -150, 0])
+        plt.plot(fast_xf, 10 * np.log10(np.abs(fast_yf) / np.max(np.abs(fast_yf))), color='blue')
+        plt.plot(xf, 10 * np.log10(np.abs(yf) / np.max(np.abs(yf))), color='red', linewidth=1)
+        plt.xlabel('Частота')
+        plt.ylabel('Децибелы')
+        plt.show()
         plt.plot(freq, [x + 100 for x in response], color='green')
         plt.xlabel('Частота')
-        plt.ylabel('Частота')
+        plt.ylabel('Децибелы')
         plt.show()
 
     def count_fft(self):
         normalized_tone = self.create_normalized_tone()
-        yf = fft(normalized_tone)
+        window = signal.windows.blackman(3500)
+        res = [elem[0] * elem[1] for elem in list(zip(normalized_tone, window))]
+        yf = fft(res)
+        yf_before = fft(normalized_tone)
         xf = fftfreq(self.N, 1 / self.sample_rate)
 
-        fast_yf = rfft(normalized_tone)
+        fast_yf = rfft(res)
         fast_xf = rfftfreq(self.N, 1 / self.sample_rate)
 
-        window = signal.windows.hamming(51)
         A = fft(window, self.N) / (len(window) / 2)
         freq = np.linspace(min(xf), max(xf), len(A))
         response = 20 * np.log10(np.abs(fftshift(A / abs(A).max())))
-        self._draw_graphic(xf, yf, fast_xf, fast_yf, freq, response)
+
+        self._draw_graphic(xf, yf, xf, yf_before, freq, response)
 
 
 if __name__ == '__main__':
